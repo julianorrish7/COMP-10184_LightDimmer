@@ -6,10 +6,10 @@
 // 
 #include <Arduino.h> 
 
-int iButton; 
 int iVal; 
 int state;
 int oldState;
+bool LEDOn = true;
  
 void setup() { 
   // configure the USB serial monitor 
@@ -27,23 +27,29 @@ void setup() {
  
  
 void loop() {
+  // read the button
   state = digitalRead(D5);
 
-  if (state != oldState){
-    // read digitized value from the D1 Mini's A/D convertor 
-    iVal = analogRead(A0); 
-    
-    // set the PWM pulse width 
-    analogWrite(D4, iVal); 
+  // check if the button has been pressed 
+  if (state != oldState) {
+    // save the old state
+    oldState = state;
 
-    // wait 1ms to add DRAMA! 
-    delay(1); 
+    if (state == 1){
+      // toggle the state of the LED
+      LEDOn = !LEDOn;
+    }
   }
 
+  // if the LED is on, control it using the variable resistor
+  if (LEDOn){
+    iVal = analogRead(A0);
+    // set the PWM pulse width
+    analogWrite(D4, iVal);
+    delay(1);
+  }
   else {
-    // iButton = digitalRead(D5); 
-    digitalWrite(D4, 1); 
+    // turn the LED off
+    digitalWrite(D4, 1);
   }
-  
-  oldState = state;
 } 
